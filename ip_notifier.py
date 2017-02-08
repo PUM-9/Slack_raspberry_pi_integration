@@ -1,6 +1,6 @@
 import netifaces as ni
 import requests
-from config import WEBHOOK, INTERFACE
+from config import WEBHOOK, INTERFACE, SAVE_FILE
 import time
 
 
@@ -18,5 +18,12 @@ if __name__ == "__main__":
         time.sleep(60)
         ip = get_ip()
         tries += 1
-    payload = {'text': ip, 'username': 'pi-bot', 'icon_emoji': ':robot_face:'}
-    requests.post(WEBHOOK, json=payload)
+    file = open(SAVE_FILE, 'r')
+    old_ip = file.read()
+    file.close()
+    if old_ip != ip:
+        payload = {'text': ip, 'username': 'pi-bot', 'icon_emoji': ':robot_face:'}
+        requests.post(WEBHOOK, json=payload)
+        file = open(SAVE_FILE, 'w')
+        file.write(ip)
+        file.close()
